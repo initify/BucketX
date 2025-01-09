@@ -1,4 +1,4 @@
-# Our bucket
+# bucketX
 Self hosted cloud storage
 
 A Powerful, open-source solution for managing image storage, optimization, and delivery
