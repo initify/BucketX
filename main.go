@@ -1,42 +1,22 @@
 package main
 
 import (
-	"net/http"
+	"bucketX/middlewares"
+	"bucketX/routes"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func main() {
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+
 	router := gin.Default()
 
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Welcome to bucketX API!",
-		})
-	})
+	router.Use(middlewares.LoggerMiddleware(logger))
 
-	router.POST("/image", func(c *gin.Context) {
-		file, err := c.FormFile("file")
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "File upload failed. Please ensure a file is provided.",
-			})
-			return
-		}
-
-		filename := file.Filename
-		if err := c.SaveUploadedFile(file, filename); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Failed to save the uploaded file.",
-			})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"message":  "File uploaded successfully",
-			"filename": filename,
-		})
-	})
+	routes.RegisterRoutes(router)
 
 	router.Run(":8080")
 }
