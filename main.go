@@ -12,7 +12,7 @@ func main() {
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Welcome to the Go Gin API!",
+			"message": "Welcome to bucketX API!",
 		})
 	})
 
