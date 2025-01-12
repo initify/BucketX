@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,9 +16,27 @@ func main() {
 	})
 
 	router.POST("/image", func(c *gin.Context) {
-     req, _ := io.ReadAll(c.Request.Body)
-		 println(string(req));
-	});
+		file, err := c.FormFile("file")
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "File upload failed. Please ensure a file is provided.",
+			})
+			return
+		}
+
+		filename := file.Filename
+		if err := c.SaveUploadedFile(file, filename); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to save the uploaded file.",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message":  "File uploaded successfully",
+			"filename": filename,
+		})
+	})
 
 	router.Run(":8080")
 }
