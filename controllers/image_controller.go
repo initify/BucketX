@@ -28,3 +28,18 @@ func UploadImageController(c *gin.Context) {
 		"filename": filename,
 	})
 }
+
+func FetchImageController(c *gin.Context) {
+	filename := c.Param("filename")
+	bucketId := c.Param("bucket_id")
+
+	filepath, err := services.FetchImagePath(filename, bucketId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.File(filepath)
+}
