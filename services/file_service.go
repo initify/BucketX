@@ -22,7 +22,7 @@ func SaveUploadedFile(c *gin.Context) (string, error) {
 
 	filename := filepath.Base(file.Filename)
 	uuidFilename := uuid.New().String() + "-" + filename
-	
+
 	if err := c.SaveUploadedFile(file, filepath.Join("uploads", bucketId, uuidFilename));
 
 	err != nil {
@@ -34,7 +34,7 @@ func SaveUploadedFile(c *gin.Context) (string, error) {
 
 func FetchFilePath(filename string, bucketId string) (string, error) {
 	filePath := filepath.Join("uploads", bucketId, filename)
-	fmt.Println(filePath)
+
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 			return "", fmt.Errorf("file does not exist: %v", err)
 	} else if err != nil {
