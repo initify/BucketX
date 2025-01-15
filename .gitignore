@@ -5,3 +5,4 @@ main
 uploads/*
 .DS_Store
 tmp/*
+.env
