@@ -3,3 +3,4 @@ test_main.go
 main
 .prettierrc
 uploads/*
+tmp/*

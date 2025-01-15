@@ -4,3 +4,4 @@ main
 .prettierrc
 uploads/*
 .DS_Store
+tmp/*
