@@ -14,7 +14,7 @@ func WelcomeController(c *gin.Context) {
 	})
 }
 
-func UploadImageController(c *gin.Context) {
+func UploadFileController(c *gin.Context) {
 	filename, err := services.SaveUploadedFile(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -29,11 +29,11 @@ func UploadImageController(c *gin.Context) {
 	})
 }
 
-func FetchImageController(c *gin.Context) {
+func FetchFileController(c *gin.Context) {
 	filename := c.Param("filename")
 	bucketId := c.Param("bucket_id")
 
-	filepath, err := services.FetchImagePath(filename, bucketId)
+	filepath, err := services.FetchFilePath(filename, bucketId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),

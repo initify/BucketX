@@ -25,7 +25,7 @@ func SaveUploadedFile(c *gin.Context) (string, error) {
 	return filename, nil
 }
 
-func FetchImagePath(filename string, bucketId string) (string, error) {
+func FetchFilePath(filename string, bucketId string) (string, error) {
 	filePath := filepath.Join("uploads", bucketId, filename)
 
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
