@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bucketX/database"
 	"bucketX/middlewares"
 	"bucketX/routes"
+	"log"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -11,6 +13,10 @@ import (
 func main() {
 	logger, _ := zap.NewProduction()
 	defer logger.Sync()
+
+	if err := database.Connect_to_mongodb(); err != nil {
+		log.Fatal("Could not connect to MongoDB")
+	}
 
 	router := gin.Default()
 
