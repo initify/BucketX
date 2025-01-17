@@ -1,3 +1,6 @@
+
+<img src="https://github.com/user-attachments/assets/1f10fb2d-65b1-4cbd-b6b0-681a66abbd37" width="300" height="300" alt="bucketX Image">
+
 # bucketX
 
 Self hosted cloud storage
