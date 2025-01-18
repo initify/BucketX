@@ -12,61 +12,64 @@ import (
 	"crypto/sha256"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func SaveUploadedFile(c *gin.Context) (string, error) {
+func SaveUploadedFile(c *gin.Context) (string, string, error) {
 	file, err := c.FormFile("file")
 	bucketId := c.PostForm("bucket_id")
+	fileKey := c.PostForm("file_key")
 	if err != nil {
-		return "", fmt.Errorf("failed to retrieve file: %v", err)
+		return "", "", fmt.Errorf("failed to get uploaded file: %v", err)
 	}
 	if bucketId == "" {
-		return "", fmt.Errorf("bucket_id is required")
+		return "", "", fmt.Errorf("bucket_id is required")
+	}
+	if fileKey == "" {
+		return "", "", fmt.Errorf("file_key is required")
 	}
 
 	fileContent, er := file.Open()
 	if er != nil {
-		return "", fmt.Errorf("failed to open uploaded file: %v", er)
+		return "", "", fmt.Errorf("failed to open uploaded file: %v", er)
 	}
 	defer fileContent.Close()
 
 	h := sha256.New()
-	if _, err := io.Copy(h, fileContent); err != nil {
-		return "", fmt.Errorf("failed to compute hash: %v", err)
+	if _, hashErr := io.Copy(h, fileContent); hashErr != nil {
+		return "", "", fmt.Errorf("failed to compute hash: %v", hashErr)
 	}
 
 	hashHex := fmt.Sprintf("%x", h.Sum(nil))
 
 	if isDuplicate, checkErr := checkDuplicateHash(bucketId, hashHex); checkErr != nil {
-		return "", fmt.Errorf("failed to check for duplicate hash: %v", checkErr)
+		return "", "", fmt.Errorf("failed to check for duplicate hash: %v", checkErr)
 	} else if isDuplicate {
-		return "", fmt.Errorf("file with the same content already exists")
+		return "", "", fmt.Errorf("file with the same content already exists")
 	}
 
 	filename := filepath.Base(file.Filename)
-	uuidFilename := uuid.New().String() + "-" + filename
 
-	if uploadErr := c.SaveUploadedFile(file, filepath.Join("uploads", bucketId, uuidFilename)); uploadErr != nil {
-		return "", fmt.Errorf("failed to save file: %v", uploadErr)
+	if uploadErr := c.SaveUploadedFile(file, filepath.Join("uploads", bucketId, filename)); uploadErr != nil {
+		return "", "", fmt.Errorf("failed to save file: %v", uploadErr)
 	}
 
-	databaseUploadErr := uploadFileToDatabase(file, bucketId, hashHex)
+	databaseUploadErr := uploadFileToDatabase(file, fileKey, bucketId, hashHex)
 	if databaseUploadErr != nil {
-		return "", fmt.Errorf("failed to upload file to database: %v", databaseUploadErr)
+		return "", "", fmt.Errorf("failed to upload file to database: %v", databaseUploadErr)
 	}
 
-	return uuidFilename, nil
+	return fileKey, filename, nil
 }
 
-func uploadFileToDatabase(file *multipart.FileHeader, bucketId string, hash string) error {
+func uploadFileToDatabase(file *multipart.FileHeader, fileKey string, bucketId string, hash string) error {
 	filename := file.Filename
 	fileSize := file.Size
 
 	fileDoc := models.File{
 		Filename: filename,
+		FileKey:  fileKey,
 		BucketId: bucketId,
 		Size:     fileSize,
 		Hash:     hash,
@@ -92,8 +95,16 @@ func checkDuplicateHash(bucketId string, hash string) (bool, error) {
 	return true, nil
 }
 
-func FetchFilePath(filename string, bucketId string) (string, error) {
-	filePath := filepath.Join("uploads", bucketId, filename)
+func FetchFilePath(fileKey string) (string, error) {
+	var file models.File
+	if err := database.MongoClient.Database("bucketX").Collection("files").FindOne(database.Ctx, bson.M{"file_key": fileKey}).Decode(&file); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return "", fmt.Errorf("file not found")
+		}
+		return "", fmt.Errorf("failed to query database: %v", err)
+	}
+
+	filePath := filepath.Join("uploads", file.BucketId, file.Filename)
 
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return "", fmt.Errorf("file does not exist: %v", err)
