@@ -1,4 +1,4 @@
-<img src="https://github.com/user-attachments/assets/2a85dab0-0576-4ed4-9b31-df1278fd6cc9" alt="bucketX Image">
+<img src="https://github.com/user-attachments/assets/fdd4f7c6-9002-4d71-b042-50747f0e769f" style="background-size: container" alt="bucketX Image">
 
 # bucketX
 
