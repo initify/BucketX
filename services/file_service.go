@@ -46,13 +46,8 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 	}
 	defer fileContent.Close()
 
-	fileBytes, readErr := io.ReadAll(fileContent)
-	if readErr != nil {
-		return "", "", fmt.Errorf("failed to read file content: %v", readErr)
-	}
-
 	h := sha256.New()
-	if _, hashErr := h.Write(fileBytes); hashErr != nil {
+	if _, hashErr := io.Copy(h, fileContent); hashErr != nil {
 		return "", "", fmt.Errorf("failed to compute hash: %v", hashErr)
 	}
 
@@ -95,6 +90,21 @@ func checkDuplicateHash(bucketId string, hash string) (bool, error) {
 	return false, nil
 }
 
+func saveMetadataMapToFile() error {
+	file, err := os.Create("file_metadata.json")
+	if err != nil {
+		return fmt.Errorf("failed to create metadata file: %v", err)
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	if err := encoder.Encode(fileMetadataMap); err != nil {
+		return fmt.Errorf("failed to encode metadata map: %v", err)
+	}
+
+	return nil
+}
+
 func FetchFilePath(fileKey string) (string, error) {
 	fileObject, exists := fileMetadataMap[fileKey]
 	if !exists {
@@ -120,21 +130,6 @@ func LoadMetadataMapFromFile() error {
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&fileMetadataMap); err != nil {
 		return fmt.Errorf("failed to decode metadata map: %v", err)
-	}
-
-	return nil
-}
-
-func saveMetadataMapToFile() error {
-	file, err := os.Create("file_metadata.json")
-	if err != nil {
-		return fmt.Errorf("failed to create metadata file: %v", err)
-	}
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	if err := encoder.Encode(fileMetadataMap); err != nil {
-		return fmt.Errorf("failed to encode metadata map: %v", err)
 	}
 
 	return nil
