@@ -17,7 +17,6 @@ type FileDataObject struct {
 	FileKey  string
 	Filename string
 	Hash     string
-	File     []byte
 }
 
 var fileMetadataMap = make(map[string]FileDataObject)
@@ -67,12 +66,15 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 
 	filename := filepath.Base(file.Filename)
 
+	if uploadErr := c.SaveUploadedFile(file, filepath.Join("uploads", bucketId, filename)); uploadErr != nil {
+		return "", "", fmt.Errorf("failed to save file: %v", uploadErr)
+	}
+
 	fileObject := FileDataObject{
 		BucketId: bucketId,
 		FileKey:  fileKey,
 		Filename: filename,
 		Hash:     hashHex,
-		File:     fileBytes,
 	}
 
 	fileMetadataMap[fileKey] = fileObject
@@ -93,13 +95,15 @@ func checkDuplicateHash(bucketId string, hash string) (bool, error) {
 	return false, nil
 }
 
-func FetchFileContent(fileKey string) ([]byte, string, error) {
+func FetchFilePath(fileKey string) (string, error) {
 	fileObject, exists := fileMetadataMap[fileKey]
 	if !exists {
-		return nil, "", fmt.Errorf("file with key %s does not exist", fileKey)
+		return "", fmt.Errorf("file with key %s does not exist", fileKey)
 	}
 
-	return fileObject.File, fileObject.Filename, nil
+	filePath := filepath.Join("uploads", fileObject.BucketId, fileObject.Filename)
+
+	return filePath, nil
 }
 
 func LoadMetadataMapFromFile() error {
