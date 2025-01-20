@@ -34,13 +34,11 @@ func UploadFileController(c *gin.Context) {
 func FetchFileController(c *gin.Context) {
 	fileKey := c.Param("file_key")
 
-	filepath, err := services.FetchFilePath(fileKey)
+	filePath, err := services.FetchFilePath(fileKey)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.File(filepath)
+	c.File(filePath)
 }

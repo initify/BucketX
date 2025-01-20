@@ -1,9 +1,9 @@
 package main
 
 import (
-	"bucketX/database"
 	"bucketX/middlewares"
 	"bucketX/routes"
+	"bucketX/services"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -14,8 +14,8 @@ func main() {
 	logger, _ := zap.NewProduction()
 	defer logger.Sync()
 
-	if err := database.Connect_to_mongodb(); err != nil {
-		log.Fatal("Could not connect to MongoDB")
+	if err := services.LoadMetadataMapFromFile(); err != nil {
+		log.Fatalf("Error loading metadata map: %v", err)
 	}
 
 	router := gin.Default()

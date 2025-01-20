@@ -6,3 +6,4 @@ uploads/*
 .DS_Store
 tmp/*
 .env
+file_metadata.json

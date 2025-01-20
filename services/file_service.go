@@ -1,20 +1,25 @@
 package services
 
 import (
-	"bucketX/database"
-	"bucketX/models"
+	"encoding/json"
 	"fmt"
 	"io"
-	"mime/multipart"
 	"os"
 	"path/filepath"
 
 	"crypto/sha256"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
+
+type FileDataObject struct {
+	BucketId string
+	FileKey  string
+	Filename string
+	Hash     string
+}
+
+var fileMetadataMap = make(map[string]FileDataObject)
 
 func SaveUploadedFile(c *gin.Context) (string, string, error) {
 	file, err := c.FormFile("file")
@@ -23,16 +28,21 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 	if err != nil {
 		return "", "", fmt.Errorf("failed to get uploaded file: %v", err)
 	}
-	if bucketId == "" {
-		return "", "", fmt.Errorf("bucket_id is required")
-	}
-	if fileKey == "" {
-		return "", "", fmt.Errorf("file_key is required")
+
+	if bucketId == "" || fileKey == "" {
+		missingFields := []string{}
+		if bucketId == "" {
+			missingFields = append(missingFields, "bucket_id")
+		}
+		if fileKey == "" {
+			missingFields = append(missingFields, "file_key")
+		}
+		return "", "", fmt.Errorf("missing required fields: %v", missingFields)
 	}
 
-	fileContent, er := file.Open()
-	if er != nil {
-		return "", "", fmt.Errorf("failed to open uploaded file: %v", er)
+	fileContent, err := file.Open()
+	if err != nil {
+		return "", "", fmt.Errorf("failed to open file: %v", err)
 	}
 	defer fileContent.Close()
 
@@ -55,62 +65,72 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 		return "", "", fmt.Errorf("failed to save file: %v", uploadErr)
 	}
 
-	databaseUploadErr := uploadFileToDatabase(file, fileKey, bucketId, hashHex)
-	if databaseUploadErr != nil {
-		return "", "", fmt.Errorf("failed to upload file to database: %v", databaseUploadErr)
+	fileObject := FileDataObject{
+		BucketId: bucketId,
+		FileKey:  fileKey,
+		Filename: filename,
+		Hash:     hashHex,
+	}
+
+	fileMetadataMap[fileKey] = fileObject
+
+	if err := saveMetadataMapToFile(); err != nil {
+		return "", "", fmt.Errorf("failed to save metadata map: %v", err)
 	}
 
 	return fileKey, filename, nil
 }
 
-func uploadFileToDatabase(file *multipart.FileHeader, fileKey string, bucketId string, hash string) error {
-	filename := file.Filename
-	fileSize := file.Size
-
-	fileDoc := models.File{
-		Filename: filename,
-		FileKey:  fileKey,
-		BucketId: bucketId,
-		Size:     fileSize,
-		Hash:     hash,
+func checkDuplicateHash(bucketId string, hash string) (bool, error) {
+	for _, fileObject := range fileMetadataMap {
+		if fileObject.BucketId == bucketId && fileObject.Hash == hash {
+			return true, nil
+		}
 	}
+	return false, nil
+}
 
-	if _, err := database.MongoClient.Database("bucketX").Collection("files").InsertOne(database.Ctx, fileDoc); err != nil {
-		return fmt.Errorf("failed to insert file to database: %v", err)
+func saveMetadataMapToFile() error {
+	file, err := os.Create("file_metadata.json")
+	if err != nil {
+		return fmt.Errorf("failed to create metadata file: %v", err)
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	if err := encoder.Encode(fileMetadataMap); err != nil {
+		return fmt.Errorf("failed to encode metadata map: %v", err)
 	}
 
 	return nil
 }
 
-func checkDuplicateHash(bucketId string, hash string) (bool, error) {
-	var file models.File
-
-	if err := database.MongoClient.Database("bucketX").Collection("files").FindOne(database.Ctx, bson.M{"bucket_id": bucketId, "hash": hash}).Decode(&file); err != nil {
-		if err == mongo.ErrNoDocuments {
-			return false, nil
-		}
-		return false, fmt.Errorf("failed to query database: %v", err)
-	}
-
-	return true, nil
-}
-
 func FetchFilePath(fileKey string) (string, error) {
-	var file models.File
-	if err := database.MongoClient.Database("bucketX").Collection("files").FindOne(database.Ctx, bson.M{"file_key": fileKey}).Decode(&file); err != nil {
-		if err == mongo.ErrNoDocuments {
-			return "", fmt.Errorf("file not found")
-		}
-		return "", fmt.Errorf("failed to query database: %v", err)
+	fileObject, exists := fileMetadataMap[fileKey]
+	if !exists {
+		return "", fmt.Errorf("file with key %s does not exist", fileKey)
 	}
 
-	filePath := filepath.Join("uploads", file.BucketId, file.Filename)
-
-	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		return "", fmt.Errorf("file does not exist: %v", err)
-	} else if err != nil {
-		return "", fmt.Errorf("failed to retrieve file info: %v", err)
-	}
+	filePath := filepath.Join("uploads", fileObject.BucketId, fileObject.Filename)
 
 	return filePath, nil
+}
+
+func LoadMetadataMapFromFile() error {
+	file, err := os.Open("file_metadata.json")
+	if err != nil {
+		if os.IsNotExist(err) {
+			fileMetadataMap = make(map[string]FileDataObject)
+			return nil
+		}
+		return fmt.Errorf("failed to open metadata file: %v", err)
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&fileMetadataMap); err != nil {
+		return fmt.Errorf("failed to decode metadata map: %v", err)
+	}
+
+	return nil
 }
