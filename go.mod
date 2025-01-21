@@ -7,7 +7,10 @@ require (
 	go.uber.org/zap v1.27.0
 )
 
-require github.com/google/go-cmp v0.6.0 // indirect
+require (
+	github.com/google/go-cmp v0.6.0 // indirect
+	gonum.org/v1/gonum v0.9.3 // indirect
+)
 
 require (
 	github.com/bytedance/sonic v1.12.7 // indirect
@@ -25,6 +28,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/nurlantulemisov/imagecompression v0.0.0-20211028165702-e399758d3838
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect

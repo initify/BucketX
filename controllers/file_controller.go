@@ -34,7 +34,9 @@ func UploadFileController(c *gin.Context) {
 func FetchFileController(c *gin.Context) {
 	fileKey := c.Param("file_key")
 
-	filePath, err := services.FetchFilePath(fileKey)
+	fileQuery := c.Query("tr")
+
+	filePath, err := services.FetchFilePath(fileKey, fileQuery)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return

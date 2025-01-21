@@ -3,6 +3,7 @@ test_main.go
 main
 .prettierrc
 uploads/*
+transformed-uploads/*
 .DS_Store
 tmp/*
 .env
