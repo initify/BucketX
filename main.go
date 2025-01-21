@@ -3,7 +3,7 @@ package main
 import (
 	"bucketX/middlewares"
 	"bucketX/routes"
-	"bucketX/services"
+	metadataObject "bucketX/services/file_metadataObject"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +14,7 @@ func main() {
 	logger, _ := zap.NewProduction()
 	defer logger.Sync()
 
-	if err := services.LoadMetadataMapFromFile(); err != nil {
+	if err := metadataObject.LoadMetadataMapFromFile(); err != nil {
 		log.Fatalf("Error loading metadata map: %v", err)
 	}
 

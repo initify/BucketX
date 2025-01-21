@@ -1,11 +1,10 @@
 package controllers
 
 import (
+	"bucketX/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-
-	"bucketX/services"
 )
 
 func WelcomeController(c *gin.Context) {
