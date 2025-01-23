@@ -25,8 +25,6 @@ import (
 // @termsOfService  http://swagger.io/terms/
 
 // @contact.name   X7 team
-// contact.url    https://fuck.dev
-// @contact.email  subid.fuck@gmail.com
 
 // @BasePath  /api/v1/
 func main() {
@@ -52,7 +50,7 @@ func main() {
 	router.StaticFile("/docs/swagger.json", "./docs/swagger.json")
 	router.GET("/swagger", func(c *gin.Context) {
 		htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
-			SpecURL: "./docs/swagger.json",
+			SpecURL: "http://localhost:8080/docs/swagger.json",
 			CustomOptions: scalar.CustomOptions{
 				PageTitle: "BucketX API Reference",
 			},

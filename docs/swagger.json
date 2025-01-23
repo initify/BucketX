@@ -5,8 +5,7 @@
         "title": "BucketX API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
-            "name": "X7 team",
-            "email": "subid.fuck@gmail.com"
+            "name": "X7 team"
         },
         "version": "1.0"
     },

@@ -5,7 +5,6 @@ definitions:
     type: object
 info:
   contact:
-    email: subid.fuck@gmail.com
     name: X7 team
   description: This is the API documentation for BucketX API.
   termsOfService: http://swagger.io/terms/
