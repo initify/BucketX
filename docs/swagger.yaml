@@ -1,0 +1,77 @@
+basePath: /api/v1/
+definitions:
+  gin.H:
+    additionalProperties: {}
+    type: object
+info:
+  contact:
+    email: subid.fuck@gmail.com
+    name: X7 team
+  description: This is the API documentation for BucketX API.
+  termsOfService: http://swagger.io/terms/
+  title: BucketX API
+  version: "1.0"
+paths:
+  /:
+    get:
+      description: Welcome to bucketX API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Welcome to bucketX API
+  /api/v1/file:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads a file to the server and returns the file's key and name.
+      parameters:
+      - description: File to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"message": "File uploaded successfully", "filename": "example.txt",
+            "file_key": "unique_file_key"}'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: '{"error": "Detailed error message"}'
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Upload a file
+      tags:
+      - files
+  /api/v1/file/{file_key}:
+    get:
+      consumes:
+      - application/json
+      description: Fetch a file
+      parameters:
+      - description: File key
+        in: path
+        name: file_key
+        required: true
+        type: string
+      - description: Transformation query
+        in: query
+        name: tr
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Fetch a file
+swagger: "2.0"

@@ -1,6 +1,7 @@
 package metadataObject
 
 import (
+	"bucketX/config"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -17,8 +18,23 @@ type FileDataObject struct {
 var FileMetadataMap = make(map[string]FileDataObject)
 var FileHashes = make(map[string]string)
 
+var (
+	metadataFile string
+	hashesFile   string
+)
+
+func Initialize(cfg config.Metadata) error {
+	metadataFile = cfg.FilePath + "metadata.json"
+	hashesFile = cfg.FilePath + "hashes.json"
+	
+	if err := LoadMetadataMapFromFile(); err != nil {
+		return err
+	}
+	return LoadFileHashesFromFile()
+}
+
 func LoadMetadataMapFromFile() error {
-	file, err := os.Open("file_metadata.json")
+	file, err := os.Open(metadataFile)
 	if err != nil {
 		if os.IsNotExist(err) {
 			FileMetadataMap = make(map[string]FileDataObject)
@@ -37,7 +53,7 @@ func LoadMetadataMapFromFile() error {
 }
 
 func SaveMetadataMapToFile() error {
-	file, err := os.Create("file_metadata.json")
+	file, err := os.Create(metadataFile)
 	if err != nil {
 		return fmt.Errorf("failed to create metadata file: %v", err)
 	}
@@ -52,7 +68,7 @@ func SaveMetadataMapToFile() error {
 }
 
 func LoadFileHashesFromFile() error {
-	file, err := os.Open("file_hashes.json")
+	file, err := os.Open(hashesFile)
 	if err != nil {
 		if os.IsNotExist(err) {
 			FileHashes = make(map[string]string)
@@ -71,7 +87,7 @@ func LoadFileHashesFromFile() error {
 }
 
 func SaveFileHashesToFile() error {
-	file, err := os.Create("file_hashes.json")
+	file, err := os.Create(hashesFile)
 	if err != nil {
 		return fmt.Errorf("failed to create file hashes file: %v", err)
 	}

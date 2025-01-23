@@ -7,5 +7,5 @@ transformed-uploads/*
 .DS_Store
 tmp/*
 .env
-file_metadata.json
-file_hashes.json
+metadata.json
+metadata
