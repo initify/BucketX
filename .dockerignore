@@ -4,3 +4,12 @@ main
 .prettierrc
 uploads/*
 tmp/*
+metadata/*
+.env.example
+.git
+.gitignore
+docker-compose.yml
+Dockerfile
+README.md
+.prettierrc
+.air.toml
