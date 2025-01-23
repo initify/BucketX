@@ -17,6 +17,9 @@ func main() {
 	if err := metadataObject.LoadMetadataMapFromFile(); err != nil {
 		log.Fatalf("Error loading metadata map: %v", err)
 	}
+	if err := metadataObject.LoadFileHashesFromFile(); err != nil {
+		log.Fatalf("Error loading file hashes: %v", err)
+	}
 
 	router := gin.Default()
 

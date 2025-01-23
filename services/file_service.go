@@ -45,7 +45,7 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 
 	hashHex := fmt.Sprintf("%x", h.Sum(nil))
 
-	if isDuplicate, checkErr := checkDuplicateHash(bucketId, hashHex); checkErr != nil {
+	if isDuplicate, checkErr := checkDuplicateHash(hashHex); checkErr != nil {
 		return "", "", fmt.Errorf("failed to check for duplicate hash: %v", checkErr)
 	} else if isDuplicate {
 		return "", "", fmt.Errorf("file with the same content already exists")
@@ -66,21 +66,21 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 	}
 
 	metadataObject.FileMetadataMap[fileKey] = fileObject
+	metadataObject.FileHashes[hashHex] = fileKey
 
 	if err := metadataObject.SaveMetadataMapToFile(); err != nil {
 		return "", "", fmt.Errorf("failed to save metadata map: %v", err)
+	}
+	if err := metadataObject.SaveFileHashesToFile(); err != nil {
+		return "", "", fmt.Errorf("failed to save file hashes: %v", err)
 	}
 
 	return fileKey, filename, nil
 }
 
-func checkDuplicateHash(bucketId string, hash string) (bool, error) {
-	for _, fileObject := range metadataObject.FileMetadataMap {
-		if fileObject.BucketId == bucketId && fileObject.Hash == hash {
-			return true, nil
-		}
-	}
-	return false, nil
+func checkDuplicateHash(hash string) (bool, error) {
+	_, exists := metadataObject.FileHashes[hash]
+	return exists, nil
 }
 
 func FetchFilePath(fileKey string, fileQuery string) (string, error) {

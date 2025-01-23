@@ -15,6 +15,7 @@ type FileDataObject struct {
 }
 
 var FileMetadataMap = make(map[string]FileDataObject)
+var FileHashes = make(map[string]string)
 
 func LoadMetadataMapFromFile() error {
 	file, err := os.Open("file_metadata.json")
@@ -45,6 +46,40 @@ func SaveMetadataMapToFile() error {
 	encoder := json.NewEncoder(file)
 	if err := encoder.Encode(FileMetadataMap); err != nil {
 		return fmt.Errorf("failed to encode metadata map: %v", err)
+	}
+
+	return nil
+}
+
+func LoadFileHashesFromFile() error {
+	file, err := os.Open("file_hashes.json")
+	if err != nil {
+		if os.IsNotExist(err) {
+			FileHashes = make(map[string]string)
+			return nil
+		}
+		return fmt.Errorf("failed to open file hashes file: %v", err)
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&FileHashes); err != nil {
+		return fmt.Errorf("failed to decode file hashes: %v", err)
+	}
+
+	return nil
+}
+
+func SaveFileHashesToFile() error {
+	file, err := os.Create("file_hashes.json")
+	if err != nil {
+		return fmt.Errorf("failed to create file hashes file: %v", err)
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	if err := encoder.Encode(FileHashes); err != nil {
+		return fmt.Errorf("failed to encode file hashes: %v", err)
 	}
 
 	return nil

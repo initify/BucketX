@@ -8,3 +8,4 @@ transformed-uploads/*
 tmp/*
 .env
 file_metadata.json
+file_hashes.json
