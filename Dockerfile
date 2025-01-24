@@ -15,7 +15,7 @@ RUN go mod download
 
 COPY . .
 
-RUN swag init -g main.go
+RUN swag init -g main.go --parseDependency --parseInternal
 
 RUN go build -o main .
 
