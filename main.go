@@ -20,9 +20,8 @@ import (
 )
 
 // @title           BucketX API
-// @version         1.0
+// @version         0.1
 // @description     This is the API documentation for BucketX API.
-// @termsOfService  http://swagger.io/terms/
 
 // @contact.name   X7 team
 
@@ -55,6 +54,7 @@ func main() {
 				PageTitle: "BucketX API Reference",
 			},
 			DarkMode: true,
+			Theme: "deepSpace",
 		})
 
 		if err != nil {
