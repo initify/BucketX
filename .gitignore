@@ -6,5 +6,5 @@ transformed-uploads/*
 .DS_Store
 tmp/*
 .env
-metadata/*
+*.aof
 docs/*
