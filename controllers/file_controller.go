@@ -11,7 +11,7 @@ import (
 // @Summary Welcome to bucketX API
 // @Description Welcome to bucketX API
 // @Produce json
-// @Success 200 {object} gin.H
+// @Success 200 {object} map[string]interface{} "{"message": "Welcome to bucketX API!"}"
 // @Router / [get]
 func WelcomeController(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
