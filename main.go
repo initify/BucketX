@@ -6,6 +6,7 @@ import (
 	_ "bucketX/docs"
 	"bucketX/middlewares"
 	"bucketX/routes"
+	"bucketX/services/metadataObject"
 	"context"
 	"net/http"
 	"os"
@@ -29,9 +30,12 @@ func main() {
 	logger, _ := zap.NewProduction()
 	defer logger.Sync()
 
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		logger.Fatal("Failed to load config", zap.Error(err))
+	metadataObject.InitializeAoF()
+	defer metadataObject.AOF.Close()
+
+	cfg, configErr := config.LoadConfig()
+	if configErr != nil {
+		logger.Fatal("Failed to load config", zap.Error(configErr))
 	}
 
 	router := gin.Default()
@@ -50,8 +54,8 @@ func main() {
 	}
 
 	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Fatal("Server failed to start", zap.Error(err))
+		if er := srv.ListenAndServe(); er != nil && er != http.ErrServerClosed {
+			logger.Fatal("Server failed to start", zap.Error(er))
 		}
 	}()
 
@@ -63,8 +67,8 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.Server.ShutdownGraceTime)
 	defer cancel()
 
-	if err := srv.Shutdown(ctx); err != nil {
-		logger.Error("Server forced to shutdown", zap.Error(err))
+	if shutdownErr := srv.Shutdown(ctx); shutdownErr != nil {
+		logger.Error("Server forced to shutdown", zap.Error(shutdownErr))
 	}
 
 	logger.Info("Server exited properly")

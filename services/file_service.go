@@ -1,6 +1,8 @@
 package services
 
 import (
+	"bucketX/services/metadataObject"
+	"encoding/json"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -42,7 +44,7 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 
 	hashHex := fmt.Sprintf("%x", h.Sum(nil))
 
-	if _, isPresent := GetFileKey(hashHex); isPresent {
+	if _, isPresent := metadataObject.GetFileKey(hashHex); isPresent {
 		return "", "", fmt.Errorf("file with the same content already exists")
 	}
 
@@ -52,7 +54,7 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 		return "", "", fmt.Errorf("failed to save file: %v", uploadErr)
 	}
 
-	fileMetadataObject := FileMetadata{
+	fileMetadataObject := metadataObject.FileMetadata{
 		BucketId:   bucketId,
 		FileKey:    fileKey,
 		Filename:   filename,
@@ -60,14 +62,33 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 		TransForms: make([]string, 0),
 	}
 
-	SetFileMetadata(fileKey, fileMetadataObject)
-	SetFileHash(hashHex, fileKey)
+	fileMetadataBytes, _ := json.Marshal(fileMetadataObject)
+
+	metadataMapObject := metadataObject.FileMapType{
+		Type:         "METADATA",
+		Filekey:      fileKey,
+		FileMetadata: string(fileMetadataBytes),
+		FileHash:     "",
+	}
+
+	hashMapObject := metadataObject.FileMapType{
+		Type:         "HASH",
+		Filekey:      fileKey,
+		FileMetadata: "",
+		FileHash:     hashHex,
+	}
+
+	metadataObject.AOF.Write(metadataMapObject)
+	metadataObject.AOF.Write(hashMapObject)
+
+	metadataObject.SetFileMetadata(fileKey, fileMetadataObject)
+	metadataObject.SetFileHash(hashHex, fileKey)
 
 	return fileKey, filename, nil
 }
 
 func FetchFilePath(fileKey string, fileQuery string) (string, error) {
-	fileObject, isPresent := GetFileMetadata(fileKey)
+	fileObject, isPresent := metadataObject.GetFileMetadata(fileKey)
 	if !isPresent {
 		return "", fmt.Errorf("file not found")
 	}

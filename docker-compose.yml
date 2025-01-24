@@ -7,7 +7,6 @@ services:
       - LOG_LEVEL=debug
     volumes:
       - uploads:/uploads
-      - metadata:/metadata
     ports:
       - '8080:8080'
     env_file:

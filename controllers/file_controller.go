@@ -31,21 +31,20 @@ func WelcomeController(c *gin.Context) {
 // @Failure 500 {object} map[string]interface{} "{"error": "Detailed error message"}"
 // @Router /api/v1/file [post]
 func UploadFileController(c *gin.Context) {
-    fileKey, filename, err := services.SaveUploadedFile(c)
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{
-            "error": err.Error(),
-        })
-        return
-    }
+	fileKey, filename, err := services.SaveUploadedFile(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 
-    c.JSON(http.StatusOK, gin.H{
-        "message":  "File uploaded successfully",
-        "filename": filename,
-        "file_key": fileKey,
-    })
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "File uploaded successfully",
+		"filename": filename,
+		"file_key": fileKey,
+	})
 }
-
 
 // godoc
 // @Summary Fetch a file

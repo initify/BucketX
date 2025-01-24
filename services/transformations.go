@@ -1,6 +1,8 @@
 package services
 
 import (
+	"bucketX/services/metadataObject"
+	"encoding/json"
 	"fmt"
 	"image"
 	"image/jpeg"
@@ -44,13 +46,25 @@ func ApplyTransformations(filename string, bucketId string, fileKey string, quer
 		return "", fmt.Errorf("failed to copy file: %v", copyErr)
 	}
 
-	fileMetadataObject, isPresent := GetFileMetadata(fileKey)
+	fileMetadataObject, isPresent := metadataObject.GetFileMetadata(fileKey)
 	if !isPresent {
 		return "", fmt.Errorf("file not found")
 	}
 
 	fileMetadataObject.TransForms = append(fileMetadataObject.TransForms, query)
-	SetFileMetadata(fileKey, fileMetadataObject)
+
+	fileMetadataBytes, _ := json.Marshal(fileMetadataObject)
+
+	metadataMapObject := metadataObject.FileMapType{
+		Type:         "METADATA",
+		Filekey:      fileKey,
+		FileMetadata: string(fileMetadataBytes),
+		FileHash:     "",
+	}
+
+	metadataObject.AOF.Write(metadataMapObject)
+
+	metadataObject.SetFileMetadata(fileKey, fileMetadataObject)
 
 	pairs := strings.Split(query, ",")
 	for _, pair := range pairs {

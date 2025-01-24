@@ -1,8 +1,15 @@
-package services
+package metadataObject
 
 import (
+	"encoding/json"
+	"log"
 	"sync"
 )
+
+var Handlers = map[string]func(FileMapType){
+	"METADATA": setMetadata,
+	"HASH":     setHash,
+}
 
 type FileMetadata struct {
 	BucketId   string
@@ -52,4 +59,26 @@ func GetFileKey(hash string) (string, bool) {
 	}
 
 	return "", false
+}
+
+func setMetadata(value FileMapType) {
+	obj, ok := StringToMetadataObj(value.FileMetadata)
+	if !ok {
+		return
+	}
+	SetFileMetadata(value.Filekey, obj)
+}
+
+func setHash(value FileMapType) {
+	SetFileHash(value.FileHash, value.Filekey)
+}
+
+func StringToMetadataObj(s string) (FileMetadata, bool) {
+	var obj FileMetadata
+	err := json.Unmarshal([]byte(s), &obj)
+	if err != nil {
+		log.Fatal(err)
+		return obj, false
+	}
+	return obj, true
 }
