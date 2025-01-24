@@ -24,10 +24,10 @@ func SetFileMetadata(fileKey string, fileMetadata FileMetadata) {
 	FileMetadataMu.Unlock()
 }
 
-func GetFileMetadata(filekey string) (FileMetadata, bool) {
+func GetFileMetadata(fileKey string) (FileMetadata, bool) {
 	FileMetadataMu.RLock()
-	fileMetadata, exists := FileMetadataMap[filekey]
-	FileHashesMu.RUnlock()
+	fileMetadata, exists := FileMetadataMap[fileKey]
+	FileMetadataMu.RUnlock()
 
 	if exists {
 		return fileMetadata, true
