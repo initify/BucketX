@@ -44,13 +44,13 @@ func ApplyTransformations(filename string, bucketId string, fileKey string, quer
 		return "", fmt.Errorf("failed to copy file: %v", copyErr)
 	}
 
-	fileObject := FileMetadataMap[fileKey]
-	fileObject.TransForms = append(fileObject.TransForms, query)
-	FileMetadataMap[fileKey] = fileObject
-
-	if err := SaveMetadataMapToFile(); err != nil {
-		return "", fmt.Errorf("failed to save metadata map: %v", err)
+	fileMetadataObject, isPresent := GetFileMetadata(fileKey)
+	if !isPresent {
+		return "", fmt.Errorf("file not found")
 	}
+
+	fileMetadataObject.TransForms = append(fileMetadataObject.TransForms, query)
+	SetFileMetadata(fileKey, fileMetadataObject)
 
 	pairs := strings.Split(query, ",")
 	for _, pair := range pairs {

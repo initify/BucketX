@@ -1,13 +1,10 @@
 package services
 
 import (
-	"bucketX/config"
-	"encoding/json"
-	"fmt"
-	"os"
+	"sync"
 )
 
-type FileDataObject struct {
+type FileMetadata struct {
 	BucketId   string
 	FileKey    string
 	Filename   string
@@ -15,88 +12,44 @@ type FileDataObject struct {
 	TransForms []string
 }
 
-var FileMetadataMap = make(map[string]FileDataObject)
-var FileHashes = make(map[string]string)
+var FileMetadataMap = make(map[string]FileMetadata)
+var FileMetadataMu = sync.RWMutex{}
 
-var (
-	metadataFile string
-	hashesFile   string
-)
+var FileHashesMap = make(map[string]string)
+var FileHashesMu = sync.RWMutex{}
 
-func Initialize(cfg config.Metadata) error {
-	metadataFile = cfg.FilePath + "metadata.json"
-	hashesFile = cfg.FilePath + "hashes.json"
-
-	if err := LoadMetadataMapFromFile(); err != nil {
-		return err
-	}
-	return LoadFileHashesFromFile()
+func SetFileMetadata(fileKey string, fileMetadata FileMetadata) {
+	FileMetadataMu.Lock()
+	FileMetadataMap[fileKey] = fileMetadata
+	FileMetadataMu.Unlock()
 }
 
-func LoadMetadataMapFromFile() error {
-	file, err := os.Open(metadataFile)
-	if err != nil {
-		if os.IsNotExist(err) {
-			FileMetadataMap = make(map[string]FileDataObject)
-			return nil
-		}
-		return fmt.Errorf("failed to open metadata file: %v", err)
-	}
-	defer file.Close()
+func GetFileMetadata(filekey string) (FileMetadata, bool) {
+	FileMetadataMu.RLock()
+	fileMetadata, exists := FileMetadataMap[filekey]
+	FileHashesMu.RUnlock()
 
-	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&FileMetadataMap); err != nil {
-		return fmt.Errorf("failed to decode metadata map: %v", err)
+	if exists {
+		return fileMetadata, true
 	}
 
-	return nil
+	return FileMetadata{}, false
 }
 
-func SaveMetadataMapToFile() error {
-	file, err := os.Create(metadataFile)
-	if err != nil {
-		return fmt.Errorf("failed to create metadata file: %v", err)
-	}
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	if err := encoder.Encode(FileMetadataMap); err != nil {
-		return fmt.Errorf("failed to encode metadata map: %v", err)
-	}
-
-	return nil
+func SetFileHash(hash string, fileKey string) {
+	FileHashesMu.Lock()
+	FileHashesMap[hash] = fileKey
+	FileHashesMu.Unlock()
 }
 
-func LoadFileHashesFromFile() error {
-	file, err := os.Open(hashesFile)
-	if err != nil {
-		if os.IsNotExist(err) {
-			FileHashes = make(map[string]string)
-			return nil
-		}
-		return fmt.Errorf("failed to open file hashes file: %v", err)
-	}
-	defer file.Close()
+func GetFileKey(hash string) (string, bool) {
+	FileHashesMu.RLock()
+	fileKey, exists := FileHashesMap[hash]
+	FileHashesMu.RUnlock()
 
-	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&FileHashes); err != nil {
-		return fmt.Errorf("failed to decode file hashes: %v", err)
+	if exists {
+		return fileKey, true
 	}
 
-	return nil
-}
-
-func SaveFileHashesToFile() error {
-	file, err := os.Create(hashesFile)
-	if err != nil {
-		return fmt.Errorf("failed to create file hashes file: %v", err)
-	}
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	if err := encoder.Encode(FileHashes); err != nil {
-		return fmt.Errorf("failed to encode file hashes: %v", err)
-	}
-
-	return nil
+	return "", false
 }

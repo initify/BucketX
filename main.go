@@ -6,7 +6,6 @@ import (
 	_ "bucketX/docs"
 	"bucketX/middlewares"
 	"bucketX/routes"
-	"bucketX/services"
 	"context"
 	"net/http"
 	"os"
@@ -33,13 +32,6 @@ func main() {
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		logger.Fatal("Failed to load config", zap.Error(err))
-	}
-
-	if err := services.Initialize(cfg.Metadata); err != nil {
-		logger.Fatal("Failed to initialize metadata service",
-			zap.String("file_path", cfg.Metadata.FilePath),
-			zap.Error(err),
-		)
 	}
 
 	router := gin.Default()
