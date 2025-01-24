@@ -5,6 +5,7 @@ main
 uploads/*
 tmp/*
 metadata/*
+docs/*
 .env.example
 .git
 .gitignore

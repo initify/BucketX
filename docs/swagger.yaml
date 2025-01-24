@@ -1,15 +1,10 @@
 basePath: /api/v1/
-definitions:
-  gin.H:
-    additionalProperties: {}
-    type: object
 info:
   contact:
     name: X7 team
   description: This is the API documentation for BucketX API.
-  termsOfService: http://swagger.io/terms/
   title: BucketX API
-  version: "1.0"
+  version: "0.1"
 paths:
   /:
     get:
@@ -18,9 +13,10 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: '{"message": "Welcome to bucketX API!"}'
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
       summary: Welcome to bucketX API
   /api/v1/file:
     post:
@@ -71,6 +67,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/gin.H'
+            type: file
+        "404":
+          description: '{"error": "Detailed error message"}'
+          schema:
+            additionalProperties: true
+            type: object
       summary: Fetch a file
 swagger: "2.0"

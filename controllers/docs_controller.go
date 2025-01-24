@@ -14,6 +14,7 @@ func ServeDocsController(c *gin.Context) {
 			PageTitle: "BucketX API Reference",
 		},
 		DarkMode: true,
+		Theme: "deepSpace",
 	})
 
 	if err != nil {
