@@ -9,7 +9,6 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "X7 team"
         },
@@ -27,9 +26,10 @@ const docTemplate = `{
                 "summary": "Welcome to bucketX API",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "{\"message\": \"Welcome to bucketX API!\"}",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -104,24 +104,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "file"
+                        }
+                    },
+                    "404": {
+                        "description": "{\"error\": \"Detailed error message\"}",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
             }
-        }
-    },
-    "definitions": {
-        "gin.H": {
-            "type": "object",
-            "additionalProperties": {}
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
+	Version:          "0.1",
 	Host:             "",
 	BasePath:         "/api/v1/",
 	Schemes:          []string{},

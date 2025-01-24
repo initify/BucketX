@@ -11,7 +11,7 @@ import (
 // @Summary Welcome to bucketX API
 // @Description Welcome to bucketX API
 // @Produce json
-// @Success 200 {object} gin.H
+// @Success 200 {object} map[string]interface{} "{"message": "Welcome to bucketX API!"}"
 // @Router / [get]
 func WelcomeController(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
@@ -54,7 +54,8 @@ func UploadFileController(c *gin.Context) {
 // @Produce json
 // @Param file_key path string true "File key"
 // @Param tr query string false "Transformation query"
-// @Success 200 {object} gin.H
+// @Success 200 {file} file
+// @Failure 404 {object} map[string]interface{} "{"error": "Detailed error message"}"
 // @Router /api/v1/file/{file_key} [get]
 func FetchFileController(c *gin.Context) {
 	fileKey := c.Param("file_key")
