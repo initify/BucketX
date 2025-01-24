@@ -1,7 +1,6 @@
-package transformations
+package services
 
 import (
-	metadataObject "bucketX/services/file_metadataObject"
 	"fmt"
 	"image"
 	"image/jpeg"
@@ -45,11 +44,11 @@ func ApplyTransformations(filename string, bucketId string, fileKey string, quer
 		return "", fmt.Errorf("failed to copy file: %v", copyErr)
 	}
 
-	fileObject := metadataObject.FileMetadataMap[fileKey]
+	fileObject := FileMetadataMap[fileKey]
 	fileObject.TransForms = append(fileObject.TransForms, query)
-	metadataObject.FileMetadataMap[fileKey] = fileObject
+	FileMetadataMap[fileKey] = fileObject
 
-	if err := metadataObject.SaveMetadataMapToFile(); err != nil {
+	if err := SaveMetadataMapToFile(); err != nil {
 		return "", fmt.Errorf("failed to save metadata map: %v", err)
 	}
 

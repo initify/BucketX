@@ -1,4 +1,4 @@
-package metadataObject
+package services
 
 import (
 	"bucketX/config"
@@ -26,7 +26,7 @@ var (
 func Initialize(cfg config.Metadata) error {
 	metadataFile = cfg.FilePath + "metadata.json"
 	hashesFile = cfg.FilePath + "hashes.json"
-	
+
 	if err := LoadMetadataMapFromFile(); err != nil {
 		return err
 	}

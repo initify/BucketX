@@ -6,7 +6,7 @@ import (
 	_ "bucketX/docs"
 	"bucketX/middlewares"
 	"bucketX/routes"
-	metadataObject "bucketX/services/file_metadataObject"
+	"bucketX/services"
 	"context"
 	"net/http"
 	"os"
@@ -35,7 +35,7 @@ func main() {
 		logger.Fatal("Failed to load config", zap.Error(err))
 	}
 
-	if err := metadataObject.Initialize(cfg.Metadata); err != nil {
+	if err := services.Initialize(cfg.Metadata); err != nil {
 		logger.Fatal("Failed to initialize metadata service",
 			zap.String("file_path", cfg.Metadata.FilePath),
 			zap.Error(err),

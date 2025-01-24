@@ -1,8 +1,6 @@
 package services
 
 import (
-	metadataObject "bucketX/services/file_metadataObject"
-	transformations "bucketX/services/file_transformations"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -56,7 +54,7 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 		return "", "", fmt.Errorf("failed to save file: %v", uploadErr)
 	}
 
-	fileObject := metadataObject.FileDataObject{
+	fileObject := FileDataObject{
 		BucketId:   bucketId,
 		FileKey:    fileKey,
 		Filename:   filename,
@@ -64,13 +62,13 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 		TransForms: make([]string, 0),
 	}
 
-	metadataObject.FileMetadataMap[fileKey] = fileObject
-	metadataObject.FileHashes[hashHex] = fileKey
+	FileMetadataMap[fileKey] = fileObject
+	FileHashes[hashHex] = fileKey
 
-	if err := metadataObject.SaveMetadataMapToFile(); err != nil {
+	if err := SaveMetadataMapToFile(); err != nil {
 		return "", "", fmt.Errorf("failed to save metadata map: %v", err)
 	}
-	if err := metadataObject.SaveFileHashesToFile(); err != nil {
+	if err := SaveFileHashesToFile(); err != nil {
 		return "", "", fmt.Errorf("failed to save file hashes: %v", err)
 	}
 
@@ -78,12 +76,12 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 }
 
 func checkDuplicateHash(hash string) (bool, error) {
-	_, exists := metadataObject.FileHashes[hash]
+	_, exists := FileHashes[hash]
 	return exists, nil
 }
 
 func FetchFilePath(fileKey string, fileQuery string) (string, error) {
-	fileObject, exists := metadataObject.FileMetadataMap[fileKey]
+	fileObject, exists := FileMetadataMap[fileKey]
 	if !exists {
 		return "", fmt.Errorf("file with key %s does not exist", fileKey)
 	}
@@ -97,7 +95,7 @@ func FetchFilePath(fileKey string, fileQuery string) (string, error) {
 			}
 		}
 
-		return transformations.ApplyTransformations(fileObject.Filename, fileObject.BucketId, fileKey, fileQuery)
+		return ApplyTransformations(fileObject.Filename, fileObject.BucketId, fileKey, fileQuery)
 	}
 
 	filePath := filepath.Join("uploads", fileObject.BucketId, fileObject.Filename)
