@@ -5,7 +5,6 @@ import (
 	transformations "bucketX/services/file_transformations"
 	"fmt"
 	"io"
-	"log"
 	"path/filepath"
 
 	"crypto/sha256"
@@ -92,7 +91,6 @@ func FetchFilePath(fileKey string, fileQuery string) (string, error) {
 	if fileQuery != "" {
 		for _, value := range fileObject.TransForms {
 			if value == fileQuery {
-				log.Println("File already transformed")
 				transformedFileExt := filepath.Ext(fileObject.Filename)
 				transformedFilename := fileObject.Filename[:len(fileObject.Filename)-len(transformedFileExt)]
 				return filepath.Join("transformed-uploads", fileObject.BucketId, transformedFilename+"_"+fileQuery+transformedFileExt), nil
