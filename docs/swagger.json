@@ -1,0 +1,113 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is the API documentation for BucketX API.",
+        "title": "BucketX API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "X7 team"
+        },
+        "version": "1.0"
+    },
+    "basePath": "/api/v1/",
+    "paths": {
+        "/": {
+            "get": {
+                "description": "Welcome to bucketX API",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Welcome to bucketX API",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/file": {
+            "post": {
+                "description": "Uploads a file to the server and returns the file's key and name.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "files"
+                ],
+                "summary": "Upload a file",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "File to upload",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"message\": \"File uploaded successfully\", \"filename\": \"example.txt\", \"file_key\": \"unique_file_key\"}",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "{\"error\": \"Detailed error message\"}",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/file/{file_key}": {
+            "get": {
+                "description": "Fetch a file",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Fetch a file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "File key",
+                        "name": "file_key",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Transformation query",
+                        "name": "tr",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "gin.H": {
+            "type": "object",
+            "additionalProperties": {}
+        }
+    }
+}

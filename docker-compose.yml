@@ -1,12 +1,19 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      target: builder
+    environment:
+      - LOG_LEVEL=debug
     volumes:
       - uploads:/uploads
+      - metadata:/metadata
     ports:
       - '8080:8080'
     env_file:
       - .env
+    restart: unless-stopped
 
 volumes:
   uploads:
+  metadata:

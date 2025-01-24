@@ -7,7 +7,7 @@ import (
 )
 
 func RegisterRoutes(router *gin.Engine) {
-	api := router.Group("/api")
+	api := router.Group("/api/v1")
 	{
 		api.GET("/", controllers.WelcomeController)
 		api.GET("/file/:file_key", controllers.FetchFileController)
