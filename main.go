@@ -2,12 +2,12 @@ package main
 
 import (
 	"bucketX/config"
+	"bucketX/controllers"
 	_ "bucketX/docs"
 	"bucketX/middlewares"
 	"bucketX/routes"
 	metadataObject "bucketX/services/file_metadataObject"
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,7 +15,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/MarceloPetrucio/go-scalar-api-reference"
 	"go.uber.org/zap"
 )
 
@@ -36,10 +35,8 @@ func main() {
 		logger.Fatal("Failed to load config", zap.Error(err))
 	}
 
-	log.Println(cfg)
-
 	if err := metadataObject.Initialize(cfg.Metadata); err != nil {
-		logger.Fatal("Failed to initialize metadata service", 
+		logger.Fatal("Failed to initialize metadata service",
 			zap.String("file_path", cfg.Metadata.FilePath),
 			zap.Error(err),
 		)
@@ -48,25 +45,7 @@ func main() {
 	router := gin.Default()
 	router.Use(middlewares.LoggerMiddleware(logger))
 	router.StaticFile("/docs/swagger.json", "./docs/swagger.json")
-	router.GET("/swagger", func(c *gin.Context) {
-		htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
-			SpecURL: "http://localhost:8080/docs/swagger.json",
-			CustomOptions: scalar.CustomOptions{
-				PageTitle: "BucketX API Reference",
-			},
-			DarkMode: true,
-		})
-
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": "Failed to generate API reference",
-			})
-			return
-		}
-
-		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(htmlContent))
-	})
-
+	router.GET("/swagger", controllers.ServeDocsController)
 
 	routes.RegisterRoutes(router)
 
