@@ -44,19 +44,24 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 
 	hashHex := fmt.Sprintf("%x", h.Sum(nil))
 
-	if _, isPresent := metadataObject.GetFileKey(hashHex); isPresent {
-		return "", "", fmt.Errorf("file with the same content already exists")
-	}
+	presentKey, isPresent := metadataObject.GetFileKey(hashHex)
 
 	filename := filepath.Base(file.Filename)
 
-	if uploadErr := c.SaveUploadedFile(file, filepath.Join("uploads", bucketId, filename)); uploadErr != nil {
-		return "", "", fmt.Errorf("failed to save file: %v", uploadErr)
+	if !isPresent {
+		uploadErr := c.SaveUploadedFile(file, filepath.Join("uploads", bucketId, filename))
+		if uploadErr != nil {
+			return "", "", fmt.Errorf("failed to save file: %v", uploadErr)
+		}
+	} else {
+		presentObject, _ := metadataObject.GetFileMetadata(presentKey)
+		if presentObject.BucketId == bucketId {
+			filename = presentObject.Filename
+		}
 	}
 
 	fileMetadataObject := metadataObject.FileMetadata{
 		BucketId:   bucketId,
-		FileKey:    fileKey,
 		Filename:   filename,
 		Hash:       hashHex,
 		TransForms: make([]string, 0),

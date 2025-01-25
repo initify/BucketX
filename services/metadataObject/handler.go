@@ -13,7 +13,6 @@ var Handlers = map[string]func(FileMapType){
 
 type FileMetadata struct {
 	BucketId   string
-	FileKey    string
 	Filename   string
 	Hash       string
 	TransForms []string
