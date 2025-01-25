@@ -4,7 +4,6 @@ main
 .prettierrc
 uploads/*
 tmp/*
-metadata/*
 docs/*
 .env.example
 .git

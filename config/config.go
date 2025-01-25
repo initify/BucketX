@@ -16,19 +16,13 @@ type Server struct {
 	ShutdownGraceTime time.Duration `mapstructure:"SHUTDOWN_GRACE_TIME"`
 }
 
-type Metadata struct {
-	FilePath         string        `mapstructure:"METADATA_FILE_PATH"`
-	AutoSaveInterval time.Duration `mapstructure:"AUTO_SAVE_INTERVAL"`
-}
-
 type Logger struct {
 	Level string `mapstructure:"LOG_LEVEL"`
 }
 
 type Config struct {
-	Server   Server
-	Metadata Metadata
-	Logger   Logger
+	Server Server
+	Logger Logger
 }
 
 func LoadConfig() (*Config, error) {
@@ -51,8 +45,6 @@ func LoadConfig() (*Config, error) {
 	cfg.Server.WriteTimeout = viper.GetDuration("WRITE_TIMEOUT") * time.Second
 	cfg.Server.IdleTimeout = viper.GetDuration("IDLE_TIMEOUT") * time.Second
 	cfg.Server.ShutdownGraceTime = viper.GetDuration("SHUTDOWN_GRACE_TIME") * time.Second
-	cfg.Metadata.FilePath = viper.GetString("METADATA_FILE_PATH")
-	cfg.Metadata.AutoSaveInterval = viper.GetDuration("AUTO_SAVE_INTERVAL") * time.Second
 	cfg.Logger.Level = viper.GetString("LOG_LEVEL")
 
 	return &cfg, nil
@@ -65,15 +57,12 @@ func setDefaults() {
 	viper.SetDefault("WRITE_TIMEOUT", 10)      // seconds
 	viper.SetDefault("IDLE_TIMEOUT", 60)       // seconds
 	viper.SetDefault("SHUTDOWN_GRACE_TIME", 5) // seconds
-	viper.SetDefault("METADATA_FILE_PATH", "./metadata.json")
-	viper.SetDefault("AUTO_SAVE_INTERVAL", 300) // seconds
 	viper.SetDefault("LOG_LEVEL", "info")
 }
 
 func validateRequiredFields() error {
 	required := map[string]string{
-		"METADATA_FILE_PATH": "path to metadata storage",
-		"PORT":               "server port",
+		"PORT": "server port",
 	}
 
 	for field, desc := range required {
