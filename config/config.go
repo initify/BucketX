@@ -10,6 +10,7 @@ import (
 
 type Server struct {
 	Port              string        `mapstructure:"PORT"`
+	AccessKey         string        `mapstructure:"ACCESS_KEY"`
 	ReadTimeout       time.Duration `mapstructure:"READ_TIMEOUT"`
 	WriteTimeout      time.Duration `mapstructure:"WRITE_TIMEOUT"`
 	IdleTimeout       time.Duration `mapstructure:"IDLE_TIMEOUT"`
@@ -41,6 +42,7 @@ func LoadConfig() (*Config, error) {
 	var cfg Config
 
 	cfg.Server.Port = viper.GetString("PORT")
+	cfg.Server.AccessKey = viper.GetString("ACCESS_KEY")
 	cfg.Server.ReadTimeout = viper.GetDuration("READ_TIMEOUT") * time.Second
 	cfg.Server.WriteTimeout = viper.GetDuration("WRITE_TIMEOUT") * time.Second
 	cfg.Server.IdleTimeout = viper.GetDuration("IDLE_TIMEOUT") * time.Second
@@ -62,7 +64,8 @@ func setDefaults() {
 
 func validateRequiredFields() error {
 	required := map[string]string{
-		"PORT": "server port",
+		"PORT":       "server port",
+		"ACCESS_KEY": "access key",
 	}
 
 	for field, desc := range required {

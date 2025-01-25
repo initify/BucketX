@@ -98,7 +98,7 @@ func InitializeAoF() {
 
 		handler, ok := Handlers[command]
 		if !ok {
-			fmt.Println("Invalid command: ", command)
+			log.Println("Invalid command: ", command)
 			return
 		}
 

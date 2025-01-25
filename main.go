@@ -39,6 +39,8 @@ func main() {
 
 	router := gin.Default()
 	router.Use(middlewares.LoggerMiddleware(logger))
+	// Turned off for now
+	// router.Use(middlewares.AuthMiddleware(cfg.Server.AccessKey))
 	router.StaticFile("/docs/swagger.json", "./docs/swagger.json")
 	router.GET("/swagger", controllers.ServeDocsController)
 
