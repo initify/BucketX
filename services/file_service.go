@@ -60,9 +60,14 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 		}
 	}
 
+	fileExt := filepath.Ext(filename)
+
+	filetype := findFileType(fileExt)
+
 	fileMetadataObject := metadataObject.FileMetadata{
 		BucketId:   bucketId,
 		Filename:   filename,
+		FileType:   filetype,
 		Hash:       hashHex,
 		TransForms: make([]string, 0),
 	}
@@ -90,6 +95,21 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 	metadataObject.SetFileHash(hashHex, fileKey)
 
 	return fileKey, filename, nil
+}
+
+func findFileType(fileExt string) string {
+	switch fileExt {
+	case ".jpg", ".jpeg", ".png":
+		return "image"
+	case ".mp4", ".avi", ".mkv":
+		return "video"
+	case ".mp3", ".wav", ".flac":
+		return "audio"
+	case ".txt", ".doc", ".docx":
+		return "document"
+	default:
+		return "other"
+	}
 }
 
 func FetchFilePath(fileKey string, fileQuery string) (string, error) {
