@@ -1,15 +1,27 @@
+# Test files
 main_test.go
 test_main.go
+
+# Executable
 main
-.prettierrc
-uploads/*
-tmp/*
-docs/*
-.env.example
-.git
-.gitignore
-docker-compose.yml
-Dockerfile
-README.md
+
+# Configuration files
 .prettierrc
 .air.toml
+.env.example
+
+# Version control
+.git
+.gitignore
+
+# Docker files
+docker-compose.yml
+Dockerfile
+
+# Documentation
+README.md
+docs/*
+
+# Temporary and uploaded files
+uploads/*
+tmp/*
