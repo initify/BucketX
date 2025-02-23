@@ -15,6 +15,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"time"
+
+	"github.com/gin-contrib/cors"
 	"go.uber.org/zap"
 )
 
@@ -38,6 +41,17 @@ func main() {
 	}
 
 	router := gin.Default()
+
+	// Add CORS middleware
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
 	router.Use(middlewares.LoggerMiddleware(logger))
 	// Turned off for now
 	// router.Use(middlewares.AuthMiddleware(cfg.Server.AccessKey))
