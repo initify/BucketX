@@ -1,8 +1,9 @@
 # bucketX
 
-<img src="https://github.com/user-attachments/assets/a862a6da-992b-4a6b-afc0-69a2874ae9c0" alt="bucketX Image">
+<img src="https://github.com/user-attachments/assets/91c06e38-4a5f-4111-bd33-80fcc2bd9627" alt="bucketX Image">
 
 Self hosted cloud storage
+
 
 A Powerful, open-source solution for managing image storage, optimization, and
 delivery
