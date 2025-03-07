@@ -69,3 +69,16 @@ func FetchFileController(c *gin.Context) {
 
 	c.File(filePath)
 }
+
+func ListFilesController(c *gin.Context) {
+	files, err := services.ListAllFiles(c)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(200, gin.H{
+		"files": files,
+	})
+}

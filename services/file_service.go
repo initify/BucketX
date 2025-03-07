@@ -13,6 +13,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type File struct {
+	FileKey      string
+	FileMetadata metadataObject.FileMetadata
+}
+
 func SaveUploadedFile(c *gin.Context) (string, string, error) {
 	file, err := c.FormFile("file")
 	bucketId := c.PostForm("bucket_id")
@@ -119,4 +124,20 @@ func FetchFilePath(fileKey string, fileQuery string) (string, error) {
 	filePath := filepath.Join("uploads", fileObject.BucketId, fileObject.Filename)
 
 	return filePath, nil
+}
+
+func ListAllFiles(c *gin.Context) ([]File, error) {
+	var files []File
+
+	metadataObject.FileMetadataMu.RLock()
+	defer metadataObject.FileMetadataMu.RUnlock()
+
+	for fileKey, fileMetadata := range metadataObject.FileMetadataMap {
+		files = append(files, File{
+			FileKey:      fileKey,
+			FileMetadata: fileMetadata,
+		})
+	}
+
+	return files, nil
 }

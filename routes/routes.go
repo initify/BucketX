@@ -13,6 +13,7 @@ func RegisterRoutes(router *gin.Engine) {
 		// Files
 		api.GET("/file/:file_key", controllers.FetchFileController)
 		api.POST("/file", controllers.UploadFileController)
+		api.GET("/files", controllers.ListFilesController)
 
 		// Buckets
 		api.GET("/buckets", controllers.ListBucketsController)
