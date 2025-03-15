@@ -60,3 +60,12 @@ func getBucketInfo(bucketPath string) (int64, int) {
 
 	return totalSize, fileCount
 }
+
+func CreateBucket(bucketName string) error {
+	bucketPath := filepath.Join("uploads", bucketName)
+	err := os.MkdirAll(bucketPath, os.ModePerm)
+	if err!= nil {
+		return fmt.Errorf("Error creating bucket: %v", err)
+	}
+	return nil
+}

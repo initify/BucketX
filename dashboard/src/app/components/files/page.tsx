@@ -42,7 +42,7 @@ export default function Files({ setFilekey, selectedBucket }: {
   }, []);
 
   useEffect(() => {
-    if (selectedBucket) {
+    if (selectedBucket && allFiles) {
       const filteredFiles = allFiles.filter(
         file => file.FileMetadata.BucketId === selectedBucket
       );
@@ -91,7 +91,7 @@ export default function Files({ setFilekey, selectedBucket }: {
 
   return (
     <div>
-      {files.length > 0 ? (
+      {files && files.length > 0 ? (
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>

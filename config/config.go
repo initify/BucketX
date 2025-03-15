@@ -65,7 +65,7 @@ func setDefaults() {
 func validateRequiredFields() error {
 	required := map[string]string{
 		"PORT":       "server port",
-		"ACCESS_KEY": "access key",
+		// "ACCESS_KEY": "access key", Turned off for now
 	}
 
 	for field, desc := range required {

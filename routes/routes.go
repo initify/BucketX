@@ -17,5 +17,6 @@ func RegisterRoutes(router *gin.Engine) {
 
 		// Buckets
 		api.GET("/buckets", controllers.ListBucketsController)
+		api.POST("/bucket", controllers.CreateBucketController)
 	}
 }
