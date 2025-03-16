@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { FiUpload, FiX, FiFile } from 'react-icons/fi';
+import { FiUpload, FiX, FiFile, FiCheckCircle } from 'react-icons/fi';
 
 export default function Upload({ setIsUploadOpen }: {
   setIsUploadOpen: (isUploadOpen: boolean) => void,
@@ -93,30 +93,44 @@ export default function Upload({ setIsUploadOpen }: {
               multiple
               onChange={handleFileChange}
             />
-            <label
-              htmlFor="file-upload"
-              className="cursor-pointer flex flex-col items-center"
-            >
-              <FiUpload className="text-gray-400 w-12 h-12 mb-4" />
-              <p className="text-gray-300 mb-2">Drag and drop files here</p>
-              <p className="text-gray-400 text-sm">or click to select files</p>
-            </label>
-          </div>
-          
-          {selectedFiles && selectedFiles.length > 0 && (
-            <div className="mt-4 bg-gray-800 rounded-lg p-3">
-              <h3 className="text-gray-300 text-sm font-medium mb-2">Selected Files:</h3>
-              <div className="max-h-32 overflow-y-auto">
-                {Array.from(selectedFiles).map((file, index) => (
-                  <div key={index} className="flex items-center py-2 border-b border-gray-700 last:border-0">
-                    <FiFile className="text-blue-400 mr-2" />
-                    <span className="text-gray-300 text-sm truncate">{file.name}</span>
-                    <span className="text-gray-500 text-xs ml-2">({(file.size / 1024).toFixed(1)} KB)</span>
-                  </div>
-                ))}
+            
+            {selectedFiles && selectedFiles.length > 0 ? (
+              <div className="flex flex-col items-center">
+                <div className="bg-blue-500/10 rounded-full p-4 mb-4">
+                  <FiCheckCircle className="text-blue-400 w-10 h-10" />
+                </div>
+                <p className="text-gray-200 font-medium mb-2">{selectedFiles.length} {selectedFiles.length === 1 ? 'file' : 'files'} selected</p>
+                <div className="flex flex-wrap justify-center gap-2 max-w-md mb-4">
+                  {Array.from(selectedFiles).slice(0, 3).map((file, index) => (
+                    <div key={index} className="flex items-center bg-gray-800 rounded-full px-3 py-1">
+                      <FiFile className="text-blue-400 mr-2" />
+                      <span className="text-gray-300 text-sm truncate max-w-[150px]">{file.name}</span>
+                    </div>
+                  ))}
+                  {selectedFiles.length > 3 && (
+                    <div className="flex items-center bg-gray-800 rounded-full px-3 py-1">
+                      <span className="text-gray-300 text-sm">+{selectedFiles.length - 3} more</span>
+                    </div>
+                  )}
+                </div>
+                <label
+                  htmlFor="file-upload"
+                  className="text-blue-400 hover:text-blue-300 cursor-pointer text-sm"
+                >
+                  Change selection
+                </label>
               </div>
-            </div>
-          )}
+            ) : (
+              <label
+                htmlFor="file-upload"
+                className="cursor-pointer flex flex-col items-center"
+              >
+                <FiUpload className="text-gray-400 w-12 h-12 mb-4" />
+                <p className="text-gray-300 mb-2">Drag and drop files here</p>
+                <p className="text-gray-400 text-sm">or click to select files</p>
+              </label>
+            )}
+          </div>
           
           <div className="mt-4 space-y-4">
             <input

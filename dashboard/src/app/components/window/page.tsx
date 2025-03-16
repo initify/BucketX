@@ -4,13 +4,16 @@ import CreateBucket from "../createBucket/page";
 import Files from "../files/page";
 import Upload from "../upload/page";
 import Viewer from "../viewer/page";
-import { useState } from "react";
-import { FiSearch, FiArrowLeft, FiRefreshCw, FiUpload, FiSettings, FiPlus } from 'react-icons/fi';
+import AccessKeys from "../accessKeys/page"; // Import the AccessKeys component
+import { useState, useEffect } from "react";
+import { FiSearch, FiArrowLeft, FiRefreshCw, FiUpload, FiSettings, FiPlus, FiKey } from 'react-icons/fi';
 
-export default function Window() {
+export default function Window({ initialView }: {
+  initialView: "buckets" | "files" | "access-keys"
+}) {
   const [filekey, setFilekey] = useState<string>("");
   const [selectedBucket, setSelectedBucket] = useState<string>("");
-  const [view, setView] = useState<"buckets" | "files">("buckets");
+  const [view, setView] = useState<"buckets" | "files" | "access-keys">(initialView); // Add access-keys to the view options
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isNewBucketOpen, setIsNewBucketOpen] = useState(false);
 
@@ -24,11 +27,24 @@ export default function Window() {
     setView("buckets");
   };
 
+  // Function to handle view changes from sidebar
+  const handleViewChange = (newView: "buckets" | "files" | "access-keys") => {
+    if (newView === "buckets") {
+      setSelectedBucket("");
+    }
+    setView(newView);
+  };
+
+  // Add useEffect to sync view with parent state
+  useEffect(() => {
+    setView(initialView);
+  }, [initialView]);
+
   return (
     <div className="flex flex-col bg-gray-900 flex-1 p-6 rounded-l-xl shadow-2xl">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
-          {view === "files" && (
+          {(view === "files" || view === "access-keys") && (
             <button 
               onClick={handleBackToBuckets}
               className="mr-4 p-2 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors"
@@ -37,7 +53,9 @@ export default function Window() {
             </button>
           )}
           <h1 className="text-2xl font-bold text-white">
-            {view === "buckets" ? "Object Browser" : `Bucket: ${selectedBucket}`}
+            {view === "buckets" ? "Object Browser" : 
+             view === "files" ? `Bucket: ${selectedBucket}` : 
+             "Access Keys"}
           </h1>
         </div>
         
@@ -45,11 +63,22 @@ export default function Window() {
           <button className="p-2 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors">
             <FiRefreshCw className="text-gray-300" />
           </button>
+          {view !== "access-keys" && (
+            <button 
+              onClick={() => setIsUploadOpen(true)}
+              className="p-2 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors"
+            >
+              <FiUpload className="text-gray-300" />
+            </button>
+          )}
+          {/* Update the access keys button */}
           <button 
-            onClick={() => setIsUploadOpen(true)}
-            className="p-2 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors"
+            onClick={() => handleViewChange("access-keys")}
+            className={`p-2 ${
+              view === "access-keys" ? "bg-blue-600" : "bg-gray-800 hover:bg-gray-700"
+            } rounded-full transition-colors`}
           >
-            <FiUpload className="text-gray-300" />
+            <FiKey className="text-gray-300" />
           </button>
           <button className="p-2 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors">
             <FiSettings className="text-gray-300" />
@@ -57,16 +86,18 @@ export default function Window() {
         </div>
       </div>
 
-      <div className="relative mb-4">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <FiSearch className="h-5 w-5 text-gray-400" />
+      {view !== "access-keys" && (
+        <div className="relative mb-4">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <FiSearch className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            placeholder={view === "buckets" ? "Search buckets..." : "Search files..."}
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-3 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
         </div>
-        <input
-          type="text"
-          placeholder={view === "buckets" ? "Search buckets..." : "Search files..."}
-          className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-3 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
-      </div>
+      )}
 
       {view === "buckets" && (
         <div className="flex justify-end mb-4">
@@ -90,6 +121,10 @@ export default function Window() {
             setFilekey={setFilekey} 
             selectedBucket={selectedBucket} 
           />
+        )}
+
+        {view === "access-keys" && (
+          <AccessKeys />
         )}
       </div>
       
