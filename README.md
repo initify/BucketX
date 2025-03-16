@@ -31,6 +31,10 @@ bucketX offers a complete solution for managing your image assets with enterpris
 - API-First Design**: Comprehensive REST API with excellent documentation
 
 <h1 align="center" style="border-bottom: none">
+    <img src="https://github.com/user-attachments/assets/2ccfea75-8953-4823-ac4a-a3b2744be5df" alt="dashboard">
+</h1>
+
+<h1 align="center" style="border-bottom: none">
     <img src="https://github.com/user-attachments/assets/ca628016-f1fc-4901-9344-61d6f19cdc97" alt="dashboard">
 </h1>
 
