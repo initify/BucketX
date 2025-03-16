@@ -1,5 +1,5 @@
 <h1 align="center" style="border-bottom: none">
-    <img src="https://github.com/user-attachments/assets/3ace43e2-d175-4d7f-8e4d-0df36b586f83" alt="bucketX Logo" width="200"><br>bucketX
+    <img src="https://github.com/user-attachments/assets/3ace43e2-d175-4d7f-8e4d-0df36b586f83" alt="bucketX Logo" width="200"><br>BucketX
 </h1>
 
 <p align="center">
@@ -29,6 +29,10 @@ bucketX offers a complete solution for managing your image assets with enterpris
 - Performance Optimization**: Built-in CDN integration and caching for blazing-fast delivery
 - Usage Analytics**: Track storage, bandwidth, and transformation metrics
 - API-First Design**: Comprehensive REST API with excellent documentation
+
+<h1 align="center" style="border-bottom: none">
+    <img src="https://github.com/user-attachments/assets/ca628016-f1fc-4901-9344-61d6f19cdc97" alt="dashboard">
+</h1>
 
 ## Installation
 
