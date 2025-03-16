@@ -1,5 +1,5 @@
 <h1 align="center" style="border-bottom: none">
-    <img src="https://github.com/user-attachments/assets/3ace43e2-d175-4d7f-8e4d-0df36b586f83" alt="bucketX Logo" width="200"><br>BucketX
+    <img src="https://github.com/user-attachments/assets/3ace43e2-d175-4d7f-8e4d-0df36b586f83" alt="bucketX Logo" width="200"><br>Bucket X
 </h1>
 
 <p align="center">
@@ -31,8 +31,20 @@ bucketX offers a complete solution for managing your image assets with enterpris
 - API-First Design**: Comprehensive REST API with excellent documentation
 
 <h1 align="center" style="border-bottom: none">
-    <img src="https://github.com/user-attachments/assets/2ccfea75-8953-4823-ac4a-a3b2744be5df" alt="dashboard">
+    <img src="https://github.com/user-attachments/assets/2ccfea75-8953-4823-ac4a-a3b2744be5df" alt="diagram">
 </h1>
+
+## Dashboard Interface
+
+The dashboard serves as the central interface for managing storage operations. From here, you can:
+
+- **Upload Images & Files** – Easily upload and manage your objects within different buckets.  
+- **Create & Manage Buckets** – Organize your stored data efficiently by creating and managing buckets.  
+- **Generate Access Keys** – Create secure access keys for authentication and permission management.  
+- **View Existing Objects** – Browse through all stored objects and their metadata in a structured view.  
+- **Manage User Access & Permissions** – Control who can access specific objects and perform operations.  
+
+This intuitive interface allows seamless interaction with your storage system, providing a streamlined experience for users.
 
 <h1 align="center" style="border-bottom: none">
     <img src="https://github.com/user-attachments/assets/ca628016-f1fc-4901-9344-61d6f19cdc97" alt="dashboard">
