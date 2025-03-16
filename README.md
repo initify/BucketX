@@ -1,5 +1,5 @@
 <h1 align="center" style="border-bottom: none">
-    <img src="https://github.com/user-attachments/assets/91c06e38-4a5f-4111-bd33-80fcc2bd9627" alt="bucketX Logo" width="400"><br>bucketX
+    <img src="https://github.com/user-attachments/assets/3ace43e2-d175-4d7f-8e4d-0df36b586f83" alt="bucketX Logo" width="200"><br>bucketX
 </h1>
 
 <p align="center">
