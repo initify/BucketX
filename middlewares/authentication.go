@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"bucketX/authentication"
+	"bucketX/auth"
 	"net/http"
 	"strings"
 
@@ -19,7 +19,7 @@ func AuthMiddleware(authToken string) gin.HandlerFunc {
 
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 
-		if !authentication.VerifyToken(token, authToken) {
+		if !auth.VerifyToken(token, authToken) {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
 			c.Abort()
 			return

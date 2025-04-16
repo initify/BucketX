@@ -8,29 +8,29 @@ import (
 	"bucketX/routes"
 	"bucketX/services/metadataObject"
 	"context"
+	"flag"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/gin-gonic/gin"
-
 	"time"
 
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 // @title           BucketX API
 // @version         0.1
 // @description     This is the API documentation for BucketX API.
-
 // @contact.name   X7 team
-
 // @BasePath  /api/v1/
 func main() {
 	logger, _ := zap.NewProduction()
 	defer logger.Sync()
+
+	portFlag := flag.String("port", "", "Port for the server to listen on")
+	flag.Parse()
 
 	metadataObject.InitializeAoF()
 	defer metadataObject.AOF.Close()
@@ -40,8 +40,13 @@ func main() {
 		logger.Fatal("Failed to load config", zap.Error(configErr))
 	}
 
-	router := gin.Default()
+	serverPort := cfg.Server.Port
+	if *portFlag != "" {
+		serverPort = *portFlag
+		logger.Info("Using port from command line argument", zap.String("port", serverPort))
+	}
 
+	router := gin.Default()
 	// Add CORS middleware
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
@@ -55,13 +60,14 @@ func main() {
 	router.Use(middlewares.LoggerMiddleware(logger))
 	// Turned off for now
 	// router.Use(middlewares.AuthMiddleware(cfg.Server.AccessKey))
+
 	router.StaticFile("/docs/swagger.json", "./docs/swagger.json")
 	router.GET("/swagger", controllers.ServeDocsController)
 
 	routes.RegisterRoutes(router)
 
 	srv := &http.Server{
-		Addr:         ":" + cfg.Server.Port,
+		Addr:         ":" + serverPort,
 		Handler:      router,
 		ReadTimeout:  cfg.Server.ReadTimeout,
 		WriteTimeout: cfg.Server.WriteTimeout,
@@ -69,6 +75,7 @@ func main() {
 	}
 
 	go func() {
+		logger.Info("Starting server", zap.String("port", serverPort))
 		if er := srv.ListenAndServe(); er != nil && er != http.ErrServerClosed {
 			logger.Fatal("Server failed to start", zap.Error(er))
 		}
@@ -77,6 +84,7 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
+
 	logger.Info("Shutting down server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.Server.ShutdownGraceTime)
