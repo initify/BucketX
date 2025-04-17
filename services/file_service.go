@@ -37,6 +37,30 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 		return "", "", fmt.Errorf("missing required fields: %v", missingFields)
 	}
 
+	// Node based on file key
+	targetNode, err := GetNodeForKey(fileKey)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to resolve target node: %v", err)
+	}
+
+	if !isLocalNode(targetNode) {
+		resp, err := ForwardUploadRequest(c, targetNode)
+		if err != nil {
+			return "", "", fmt.Errorf("failed to forward upload request: %v", err)
+		}
+		defer resp.Body.Close()
+
+		var result struct {
+			Filename string `json:"filename"`
+			FileKey  string `json:"file_key"`
+		}
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return "", "", fmt.Errorf("failed to decode forwarded response: %v", err)
+		}
+
+		return result.FileKey, result.Filename, nil
+	}
+
 	fileContent, err := file.Open()
 	if err != nil {
 		return "", "", fmt.Errorf("failed to open file: %v", err)
@@ -67,7 +91,6 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 	}
 
 	fileExt := filepath.Ext(filename)
-
 	filetype := utils.FindFileType(fileExt)
 
 	fileMetadataObject := metadataObject.FileMetadata{
@@ -104,6 +127,19 @@ func SaveUploadedFile(c *gin.Context) (string, string, error) {
 }
 
 func FetchFilePath(fileKey string, fileQuery string) (string, error) {
+	targetNode, err := GetNodeForKey(fileKey)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve target node: %v", err)
+	}
+
+	if !isLocalNode(targetNode) {
+		remoteFilePath, err := ForwardFetchRequest(fileKey, fileQuery, targetNode)
+		if err != nil {
+			return "", fmt.Errorf("failed to fetch file from remote node: %v", err)
+		}
+		return remoteFilePath, nil
+	}
+
 	fileObject, isPresent := metadataObject.GetFileMetadata(fileKey)
 	if !isPresent {
 		return "", fmt.Errorf("file not found")
@@ -117,13 +153,10 @@ func FetchFilePath(fileKey string, fileQuery string) (string, error) {
 				return filepath.Join("transformed-uploads", fileObject.BucketId, transformedFilename+"_"+fileQuery+transformedFileExt), nil
 			}
 		}
-
 		return ApplyTransformations(fileObject.Filename, fileObject.BucketId, fileKey, fileQuery)
 	}
 
-	filePath := filepath.Join("uploads", fileObject.BucketId, fileObject.Filename)
-
-	return filePath, nil
+	return filepath.Join("uploads", fileObject.BucketId, fileObject.Filename), nil
 }
 
 func ListAllFiles(c *gin.Context) ([]File, error) {

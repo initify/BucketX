@@ -7,6 +7,7 @@ import (
 	"bucketX/middlewares"
 	"bucketX/routes"
 	"bucketX/services/metadataObject"
+	"bucketX/services"
 	"context"
 	"flag"
 	"net/http"
@@ -38,6 +39,10 @@ func main() {
 	cfg, configErr := config.LoadConfig()
 	if configErr != nil {
 		logger.Fatal("Failed to load config", zap.Error(configErr))
+	}
+
+	if err := services.Initialize(); err != nil {
+		logger.Fatal("Failed to initialize node cluster", zap.Error(err))
 	}
 
 	serverPort := cfg.Server.Port
