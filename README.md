@@ -82,6 +82,15 @@ go mod tidy
 docker compose up -d
 ```
 
+### Installation
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/initify/BucketX/main/install.sh | bash
+```
+
+https://github.com/user-attachments/assets/51a19bcb-2049-4a82-b110-16810c4853ba
+
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to
