@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  A powerful, self-hosted cloud storage solution for managing image storage, optimization, and delivery
+  A powerful, self-hosted cloud storage solution for managing file storage, optimization, and delivery
 </p>
 
 <div align="center">
